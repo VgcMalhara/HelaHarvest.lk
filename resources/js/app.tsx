@@ -2,10 +2,13 @@ import { createInertiaApp } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
+import AdminLayout from '@/layouts/AdminLayout';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import BuyerLayout from './layouts/BuyerLayout';
 import SellerLayout from './layouts/SellerLayout';
+// අලුතින් හදපු BuyerLayout එක මෙතනට import කරන්න
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -19,6 +22,13 @@ createInertiaApp({
                 return null;
             case name.startsWith('Seller/'):
                 return SellerLayout;
+            case name.startsWith('Admin/'):
+                return AdminLayout;
+
+            // Buyer pages සඳහා layout එක මෙතනින් set කරනවා
+            case name.startsWith('Buyer/'):
+                return BuyerLayout;
+
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             default:
