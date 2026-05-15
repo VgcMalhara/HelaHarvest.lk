@@ -10,7 +10,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // දැනට අපි Dummy data යවමු, පස්සේ Database එකෙන් මේවා ගන්න පුළුවන්
         return Inertia::render('Seller/Dashboard', [
             'stats' => [
                 'totalSales' => 12500,

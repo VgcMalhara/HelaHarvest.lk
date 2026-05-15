@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 export default function SellerLayout({ children, title }: { children: React.ReactNode, title?: string }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    // Sidebar එකේ තියෙන්න ඕන links ටික
     const menuItems = [
         { name: 'Dashboard', icon: LayoutDashboard, href: '/seller/dashboard' },
         { name: 'Products', icon: ShoppingBasket, href: '/seller/products' },
@@ -17,7 +16,6 @@ export default function SellerLayout({ children, title }: { children: React.Reac
         <div className="min-h-screen bg-[#f8fafc] flex">
             <Head title={title ? `${title} | Seller` : 'Seller Dashboard'} />
 
-            {/* Mobile එකේදී විතරක් Sidebar එක වැහෙන Overlay එක */}
             {isSidebarOpen && (
                 <div className="fixed inset-0 bg-black/40 z-40 lg:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsSidebarOpen(false)} />
             )}

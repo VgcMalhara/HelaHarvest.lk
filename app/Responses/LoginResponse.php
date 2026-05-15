@@ -18,7 +18,9 @@ class LoginResponse implements LoginResponseContract
         if ($user->hasRole('seller')) {
             return redirect()->intended('/seller/dashboard');
         }
-
+        if ($user->hasRole('buyer')) {
+            return redirect()->intended('/buyer/dashboard');
+        }
         return redirect()->intended('/');
     }
 }
