@@ -4,6 +4,7 @@
 use App\Http\Controllers\Seller\DashboardController as SellerDashboard;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Buyer\BuyerDashboardController;
+use App\Http\Controllers\Seller\ProductController;
 use App\Http\Controllers\SellerAuthController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -21,17 +22,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Seller Dashboard
-Route::middleware(['auth', 'role:seller'])->group(function () {
-    Route::get('/seller/dashboard', [SellerDashboard::class, 'index'])->name('seller.dashboard');
+Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
+    Route::get('/dashboard', [SellerDashboard::class, 'index'])->name('dashboard');
+
+    //products
+    Route::resource('products', ProductController::class);
 });
 
 // Admin Dashboard
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('admin.dashboard');
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
 });
 
-Route::middleware(['auth', 'role:buyer'])->prefix('buyer')->group(function () {
-    Route::get('/dashboard', [BuyerDashboardController::class, 'index'])->name('buyer.dashboard');
+Route::middleware(['auth', 'role:buyer'])->prefix('buyer')->name('buyer.')->group(function () {
+    Route::get('/dashboard', [BuyerDashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__.'/settings.php';
