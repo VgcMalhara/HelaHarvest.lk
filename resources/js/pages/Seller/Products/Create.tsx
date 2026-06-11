@@ -3,6 +3,7 @@ import {
     PhotoIcon, XMarkIcon, ArrowLeftIcon, CheckCircleIcon, CubeIcon, TagIcon
 } from '@heroicons/react/24/outline';
 import { useState, useCallback } from 'react';
+import { route } from 'ziggy-js';
 
 export default function Create() {
     const [preview, setPreview] = useState<string | null>(null);

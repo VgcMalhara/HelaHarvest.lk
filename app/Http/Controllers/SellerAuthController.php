@@ -61,7 +61,7 @@ class SellerAuthController extends Controller
                 'profile_image' => $imagePath,
                 'district' => $request->district,
                 'city' => $request->city,
-                'status' => 'pending',
+                'status' => 'active',
             ]);
 
             DB::commit();

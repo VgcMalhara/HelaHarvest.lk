@@ -1,5 +1,3 @@
-import React, { useState, ReactNode } from 'react';
-import { Link, usePage } from '@inertiajs/react'; // usePage එක අනිවාර්යයෙන් import කරන්න
 import {
     Squares2X2Icon,
     UsersIcon,
@@ -9,7 +7,11 @@ import {
     XMarkIcon,
     BuildingStorefrontIcon
 } from '@heroicons/react/24/outline';
-import { PageProps } from '@/types'; // ඔයාගේ types file එක
+import { Link, usePage } from '@inertiajs/react'; // usePage එක අනිවාර්යයෙන් import කරන්න
+import type { ReactNode } from 'react';
+import React, { useState } from 'react';
+import { route } from 'ziggy-js';
+import type { PageProps } from '@/types'; // ඔයාගේ types file එක
 
 interface AdminLayoutProps {
     children: ReactNode;
@@ -25,9 +27,9 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
 
     const navItems = [
         { name: 'Dashboard', icon: Squares2X2Icon, href: route('admin.dashboard') },
-        { name: 'Vendors', icon: BuildingStorefrontIcon, href: '#' },
-        { name: 'Users', icon: UsersIcon, href: '#' },
-        { name: 'Products', icon: ShoppingBagIcon, href: '#' },
+        { name: 'Vendors', icon: BuildingStorefrontIcon, href: route('admin.sellers.index') },
+        { name: 'Buyers', icon: UsersIcon, href: route('admin.buyers.index') },
+        { name: 'Products', icon: ShoppingBagIcon, href: route('admin.products.index') },
     ];
 
     // User undefined නම් මොකුත් පෙන්වන්න එපා (Error එක නැති කරන්න)
