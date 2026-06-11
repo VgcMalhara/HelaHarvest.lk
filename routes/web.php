@@ -12,6 +12,13 @@ use App\Http\Controllers\Seller\ProductController;
 use App\Http\Controllers\SellerAuthController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use App\Http\Controllers\ShopController;
+
+
+
+// Public Shop Routes
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/product/{id}', [ShopController::class, 'show'])->name('shop.products.show');
 
 Route::inertia('/', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),

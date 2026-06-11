@@ -8,6 +8,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import BuyerLayout from './layouts/BuyerLayout';
 import SellerLayout from './layouts/SellerLayout';
+import ShopLayout from './layouts/ShopLayout';
 // අලුතින් හදපු BuyerLayout එක මෙතනට import කරන්න
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -28,6 +29,9 @@ createInertiaApp({
             // Buyer pages සඳහා layout එක මෙතනින් set කරනවා
             case name.startsWith('Buyer/'):
                 return BuyerLayout;
+
+            case name.startsWith('Shop/'):
+                return ShopLayout;
 
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];

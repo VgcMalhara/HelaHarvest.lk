@@ -5,13 +5,15 @@ import {
     ArrowLeftOnRectangleIcon,
     Bars3Icon,
     XMarkIcon,
-    BuildingStorefrontIcon
+    BuildingStorefrontIcon,
+    HomeIcon,                 // 👈 Home Icon එක
+    ArrowTopRightOnSquareIcon // 👈 Live Site එකට යන්න ලස්සන External Link Icon එකක්
 } from '@heroicons/react/24/outline';
-import { Link, usePage } from '@inertiajs/react'; // usePage එක අනිවාර්යයෙන් import කරන්න
+import { Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import React, { useState } from 'react';
 import { route } from 'ziggy-js';
-import type { PageProps } from '@/types'; // ඔයාගේ types file එක
+import type { PageProps } from '@/types';
 
 interface AdminLayoutProps {
     children: ReactNode;
@@ -21,7 +23,6 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children, title }: AdminLayoutProps) {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-    // මෙන්න මෙතනින් තමයි user data ටික කෙළින්ම ගන්නේ
     const { auth } = usePage<PageProps>().props;
     const user = auth.user;
 
@@ -32,7 +33,6 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
         { name: 'Products', icon: ShoppingBagIcon, href: route('admin.products.index') },
     ];
 
-    // User undefined නම් මොකුත් පෙන්වන්න එපා (Error එක නැති කරන්න)
     if (!user) return null;
 
     return (
@@ -81,21 +81,53 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
 
             {/* Main Area */}
             <div className="xl:ml-72 flex flex-col min-h-screen">
+
+                {/* --- HEADER BAR --- */}
                 <header className="h-20 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-40">
-                    <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="xl:hidden p-2 text-gray-500">
-                        {isSidebarOpen ? <XMarkIcon className="w-7 h-7" /> : <Bars3Icon className="w-7 h-7" />}
-                    </button>
-
-                    <h2 className="text-xl font-black text-gray-900 dark:text-white">{title || 'Admin Panel'}</h2>
-
                     <div className="flex items-center gap-4">
-                        <div className="text-right hidden sm:block">
-                            <p className="text-sm font-black text-gray-900 dark:text-white">{user.name}</p>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-right">Administrator</p>
+                        <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="xl:hidden p-2 text-gray-500">
+                            {isSidebarOpen ? <XMarkIcon className="w-7 h-7" /> : <Bars3Icon className="w-7 h-7" />}
+                        </button>
+                        <h2 className="text-xl font-black text-gray-900 dark:text-white">{title || 'Admin Panel'}</h2>
+                    </div>
+
+                    {/* Right Side Actions */}
+                    <div className="flex items-center gap-6">
+
+                        {/* --- TOP BAR NAVIGATION BUTTONS (GREEN THEME) --- */}
+                        <div className="flex items-center gap-2 border-r border-gray-200 dark:border-white/10 pr-4 h-9">
+                            {/* Home Button */}
+                            <Link
+                                href="/"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-all"
+                                title="Go to Website Home"
+                            >
+                                <HomeIcon className="w-4 h-4" />
+                                <span className="hidden md:inline">Home</span>
+                            </Link>
+
+                            {/* Marketplace Button */}
+                            <Link
+                                href="/shop"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-green-600 text-white hover:bg-green-700 shadow-sm shadow-green-600/20 transition-all"
+                                title="Go to Marketplace"
+                            >
+                                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                                <span className="hidden md:inline">Marketplace</span>
+                            </Link>
                         </div>
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-bold border-2 border-white dark:border-white/10">
-                            {user.name.charAt(0)}
+
+                        {/* Profile Info */}
+                        <div className="flex items-center gap-3">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-sm font-black text-gray-900 dark:text-white">{user.name}</p>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-right">Administrator</p>
+                            </div>
+                            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-bold border-2 border-white dark:border-white/10">
+                                {user.name.charAt(0)}
+                            </div>
                         </div>
+
                     </div>
                 </header>
 
