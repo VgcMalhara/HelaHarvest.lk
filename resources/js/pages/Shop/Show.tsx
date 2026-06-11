@@ -10,7 +10,7 @@ import {
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
-// 👈 Layout එක persistent විදිහට පල්ලෙහායින් සෙට් කරනවා
+import ShopLayout from '@/layouts/ShopLayout'; // 👈 Layout එක persistent විදිහට පල්ලෙහායින් සෙට් කරනවා
 
 interface ProductShowProps {
     product: {
