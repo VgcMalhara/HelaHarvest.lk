@@ -3,6 +3,7 @@ import {
     EnvelopeIcon,
     LockClosedIcon,
     ArrowRightIcon,
+    ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import { useForm, Head, Link } from '@inertiajs/react';
 import React from 'react';
@@ -26,60 +27,82 @@ export default function Login({ status, canResetPassword }) {
         <>
             <Head title="Login - HelaHarvest" />
 
-            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-100 dark:from-[#07130d] dark:via-[#0b1812] dark:to-[#102419] flex items-center justify-center px-4 py-10 transition-colors duration-300">
+            <div className="min-h-screen bg-slate-50 dark:bg-[#030712] flex items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300 relative">
 
-                {/* MAIN CARD */}
-                <div className="w-full max-w-[1200px] min-h-[750px] bg-white dark:bg-[#111827] rounded-[40px] shadow-[0_30px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.45)] overflow-hidden flex flex-col lg:flex-row border border-gray-100 dark:border-white/10 transition-colors duration-300">
+                {/* Ambient Background Glows using #00A63E */}
+                <div className="absolute top-10 left-10 w-72 h-72 bg-[#00A63E]/10 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#00A63E]/10 rounded-full blur-[100px] pointer-events-none" />
 
-                    {/* LEFT SIDE (Visual) */}
-                    <div className="lg:w-[45%] bg-gradient-to-br from-green-700 via-green-600 to-emerald-700 relative overflow-hidden flex flex-col justify-center p-12 text-white">
+                {/* MAIN CARD CONTAINER */}
+                <div className="w-full max-w-[1150px] bg-white dark:bg-[#111827] rounded-[40px] shadow-[0_30px_80px_rgba(0,0,0,0.06)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col lg:flex-row border border-gray-100 dark:border-white/10 min-h-[720px] transition-colors duration-300">
 
-                        {/* Decorative Circles */}
-                        <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] rounded-full bg-white/10 blur-3xl"></div>
-                        <div className="absolute bottom-[-100px] right-[-100px] w-[350px] h-[350px] rounded-full bg-black/10 blur-3xl"></div>
+                    {/* LEFT SIDE (Visual Brand Panel) */}
+                    <div className="lg:w-[43%] relative overflow-hidden flex flex-col justify-between p-10 sm:p-12 text-white bg-[#004d1c] min-h-[300px] lg:min-h-auto">
 
-                        <div className="relative z-10 space-y-8">
-                            <div className="w-20 h-20 rounded-[24px] bg-white/15 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
-                                <ShoppingBagIcon className="w-10 h-10 text-white" />
+                        {/* Background Gradients using your exact green color */}
+                        <div className="absolute inset-0 z-0">
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#00A63E] via-[#00782d] to-[#004d1c]" />
+                            <div className="absolute top-[-80px] left-[-80px] w-72 h-72 rounded-full bg-white/10 blur-3xl" />
+                            <div className="absolute bottom-[-80px] right-[-80px] w-80 h-80 rounded-full bg-black/10 blur-3xl" />
+                        </div>
+
+                        {/* Top Action - Back Button Inside layout */}
+                        <div className="relative z-10">
+                            <Link
+                                href="/"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/15 dark:bg-black/20 hover:bg-white/20 text-white font-bold text-xs tracking-wider uppercase backdrop-blur-xl border border-white/10 transition-all active:scale-[0.98]"
+                            >
+                                <ArrowLeftIcon className="w-4 h-4" />
+                                Back to Home
+                            </Link>
+                        </div>
+
+                        {/* Middle Content Branding */}
+                        <div className="relative z-10 space-y-6 my-auto pt-4 lg:pt-0">
+                            <div className="w-16 h-16 rounded-[22px] bg-white/15 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
+                                <ShoppingBagIcon className="w-8 h-8 text-white" />
                             </div>
 
-                            <h1 className="text-4xl 2xl:text-5xl font-black leading-tight tracking-tight">
-                                Welcome Back <br />
-                                to HelaHarvest
-                            </h1>
+                            <div className="space-y-3">
+                                <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+                                    Welcome Back <br /> to HelaHarvest
+                                </h1>
+                                <p className="text-base text-green-100/90 leading-relaxed max-w-sm font-medium">
+                                    Sign in to continue your journey. Whether you are buying fresh or selling local, we've got you covered.
+                                </p>
+                            </div>
 
-                            <p className="text-lg text-green-100 leading-relaxed max-w-md">
-                                Sign in to continue your journey. Whether you are buying fresh or selling local, we've got you covered.
-                            </p>
-
-                            <div className="pt-8 flex flex-col gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">✅</div>
-                                    <span className="font-medium">Secure Transactions</span>
+                            <div className="pt-4 flex flex-col gap-3">
+                                <div className="flex items-center gap-3 text-sm font-semibold text-green-100/90">
+                                    <span className="w-6 h-6 rounded-xl bg-white/10 flex items-center justify-center text-xs">✅</span> Secure Transactions
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">✅</div>
-                                    <span className="font-medium">Direct Farm-to-Table</span>
+                                <div className="flex items-center gap-3 text-sm font-semibold text-green-100/90">
+                                    <span className="w-6 h-6 rounded-xl bg-white/10 flex items-center justify-center text-xs">✅</span> Direct Farm-to-Table
                                 </div>
                             </div>
                         </div>
+
+                        {/* Bottom Feature Footer */}
+                        <div className="relative z-10 hidden lg:block pt-4 border-t border-white/10 text-xs text-green-200/40 font-bold uppercase tracking-widest">
+                            Verified Local Platform
+                        </div>
                     </div>
 
-                    {/* RIGHT SIDE (Form) */}
+                    {/* RIGHT SIDE (Interactive Sign-In Form) */}
                     <div className="flex-1 bg-white dark:bg-[#111827] flex flex-col justify-center px-8 py-12 sm:px-16 lg:px-20 transition-colors duration-300">
+                        <div className="max-w-[420px] w-full mx-auto space-y-10">
 
-                        <div className="max-w-[420px] mx-auto w-full">
-                            <div className="mb-10">
+                            <div>
                                 <h2 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">
                                     Sign In
                                 </h2>
-                                <p className="text-gray-500 dark:text-gray-400 mt-3 text-lg">
+                                <p className="text-gray-500 dark:text-gray-400 mt-3 text-lg font-medium">
                                     Enter your details to access your account.
                                 </p>
                             </div>
 
                             {status && (
-                                <div className="mb-6 p-4 rounded-2xl bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 font-bold text-sm">
+                                <div className="p-4 rounded-2xl bg-green-50 dark:bg-green-500/10 text-[#00A63E] font-bold text-sm border border-[#00A63E]/10">
                                     {status}
                                 </div>
                             )}
@@ -102,7 +125,7 @@ export default function Login({ status, canResetPassword }) {
                                             autoFocus
                                         />
                                     </div>
-                                    {errors.email && <p className="text-red-500 text-sm ml-1">{errors.email}</p>}
+                                    {errors.email && <p className="text-red-500 text-sm font-semibold mt-1 ml-1">{errors.email}</p>}
                                 </div>
 
                                 {/* PASSWORD */}
@@ -112,7 +135,7 @@ export default function Login({ status, canResetPassword }) {
                                             Password
                                         </label>
                                         {canResetPassword && (
-                                            <Link href={route('password.request')} className="text-xs font-bold text-green-600 hover:text-emerald-500">
+                                            <Link href={route('password.request')} className="text-xs font-bold text-[#00A63E] hover:text-[#00782d] transition-colors">
                                                 Forgot Password?
                                             </Link>
                                         )}
@@ -128,19 +151,19 @@ export default function Login({ status, canResetPassword }) {
                                             required
                                         />
                                     </div>
-                                    {errors.password && <p className="text-red-500 text-sm ml-1">{errors.password}</p>}
+                                    {errors.password && <p className="text-red-500 text-sm font-semibold mt-1 ml-1">{errors.password}</p>}
                                 </div>
 
                                 {/* REMEMBER ME */}
-                                <div className="flex items-center ml-1">
+                                <div className="flex items-center ml-1 pt-1">
                                     <input
                                         type="checkbox"
                                         id="remember"
                                         checked={data.remember}
                                         onChange={(e) => setData('remember', e.target.checked)}
-                                        className="w-5 h-5 rounded-lg border-gray-200 dark:border-white/10 text-green-600 focus:ring-green-500 dark:bg-[#1f2937]"
+                                        className="w-5 h-5 rounded-lg border-gray-200 dark:border-white/10 text-[#00A63E] focus:ring-[#00A63E] dark:bg-[#1f2937] focus:ring-offset-0 custom-checkbox cursor-pointer"
                                     />
-                                    <label htmlFor="remember" className="ml-3 text-sm font-semibold text-gray-500 dark:text-gray-400 cursor-pointer">
+                                    <label htmlFor="remember" className="ml-3 text-sm font-semibold text-gray-500 dark:text-gray-400 cursor-pointer select-none">
                                         Keep me logged in
                                     </label>
                                 </div>
@@ -149,7 +172,7 @@ export default function Login({ status, canResetPassword }) {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="group w-full h-[68px] rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-black text-lg shadow-[0_15px_35px_rgba(34,197,94,0.25)] transition-all duration-300 active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-3"
+                                    className="group w-full h-[64px] sm:h-[68px] rounded-2xl bg-gradient-to-r from-[#00A63E] to-[#00782d] hover:from-[#00782d] hover:to-[#004d1c] text-white font-black text-lg shadow-[0_15px_35px_rgba(0,166,62,0.2)] transition-all duration-300 active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-3 mt-2"
                                 >
                                     {processing ? 'Signing In...' : (
                                         <>
@@ -160,19 +183,20 @@ export default function Login({ status, canResetPassword }) {
                                 </button>
 
                                 {/* SIGNUP LINK */}
-                                <p className="text-center text-gray-500 dark:text-gray-400 text-base pt-4 font-medium">
+                                <p className="text-center text-gray-500 dark:text-gray-400 text-base pt-3 font-medium">
                                     New to HelaHarvest?
-                                    <Link href={route('register')} className="ml-2 font-black text-green-600 hover:text-green-500 underline underline-offset-4">
+                                    <Link href={route('register')} className="ml-2 font-black text-[#00A63E] hover:text-[#00782d] dark:text-[#00A63E] underline underline-offset-4 transition-colors">
                                         Create Account
                                     </Link>
                                 </p>
                             </form>
+
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* CSS STYLES (Register එකේ තිබ්බ විදිහටම) */}
+            {/* --- REUSABLE INLINE CSS (MATCHING REGISTER SCREEN) --- */}
             <style>{`
                 .input-field {
                     width: 100%;
@@ -194,8 +218,8 @@ export default function Login({ status, canResetPassword }) {
                 }
                 .input-field:focus {
                     background: white;
-                    border-color: #22c55e;
-                    box-shadow: 0 0 0 5px rgba(34,197,94,.12);
+                    border-color: #00A63E;
+                    box-shadow: 0 0 0 5px rgba(0, 166, 62, 0.12);
                 }
                 .dark .input-field:focus {
                     background: #111827;
@@ -210,6 +234,10 @@ export default function Login({ status, canResetPassword }) {
                 }
                 .dark .input-icon {
                     color: #6b7280;
+                }
+                .custom-checkbox:checked {
+                    background-color: #00A63E !important;
+                    border-color: #00A63E !important;
                 }
             `}</style>
         </>
