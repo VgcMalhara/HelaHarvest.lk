@@ -1,9 +1,17 @@
-import { MagnifyingGlassIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
+import {
+    MagnifyingGlassIcon,
+    ShoppingBagIcon,
+    UserIcon,
+    AdjustmentsHorizontalIcon,
+    FunnelIcon,
+    CurrencyDollarIcon,
+    CheckCircleIcon,
+    XCircleIcon
+} from '@heroicons/react/24/outline';
 import { Head, Link } from '@inertiajs/react';
 import { useState, useMemo, useEffect } from 'react';
 import { route } from 'ziggy-js';
 
-// TypeScript Interface එකක් දාගත්තම කෝඩ් එක වඩාත් පැහැදිලියි
 interface Product {
     id: number;
     name: string;
@@ -25,162 +33,312 @@ export default function Index({ products = [] }: IndexProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [maxPrice, setMaxPrice] = useState<number | ''>('');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'in-stock'>('all');
 
-    // Live Search එක Lag වෙන්නේ නැතිවෙන්න Debounce එකක් දානවා (300ms)
+    // Debounce for high-performance search
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearch(searchQuery);
         }, 300);
-
         return () => clearTimeout(handler);
     }, [searchQuery]);
 
-    // Categories ටික clean කරලා dynamic අරගන්නවා
-    const categories = useMemo(() => {
-        if (!products || products.length === 0) return ['All'];
-
-        // Trim කරලා, මුල් අකුර Capitalize කරලා unique සෙට් එකක් ගන්නවා
-        const uniqueCategories = Array.from(
-            new Set(
-                products
-                    .map((p) => p.category?.trim())
-                    .filter(Boolean)
-            )
-        );
-
-        return ['All', ...uniqueCategories];
+    // Find the highest price to set dynamic ranges if needed
+    const highestProductPrice = useMemo(() => {
+        if (!products.length) return 1000;
+        return Math.max(...products.map(p => p.price));
     }, [products]);
 
-    // Optimized filtering logic (Debounced search එකෙන් දුවන්නේ)
+    // Extract Unique Categories dynamically
+    const categories = useMemo(() => {
+        if (!products.length) return ['All'];
+        const unique = Array.from(new Set(products.map((p) => p.category?.trim()).filter(Boolean)));
+        return ['All', ...unique];
+    }, [products]);
+
+    // Advanced Filtering Logic
     const filteredProducts = useMemo(() => {
-        if (!products) return [];
-
         const searchLower = debouncedSearch.toLowerCase().trim();
-
         return products.filter((product) => {
             const matchesSearch = !searchLower || product.name.toLowerCase().includes(searchLower);
             const matchesCat = selectedCategory === 'All' || product.category === selectedCategory;
-            return matchesSearch && matchesCat;
+            const matchesPrice = maxPrice === '' || product.price <= maxPrice;
+            const matchesStatus = statusFilter === 'all' || product.stock > 0;
+
+            return matchesSearch && matchesCat && matchesPrice && matchesStatus;
         });
-    }, [products, debouncedSearch, selectedCategory]);
+    }, [products, debouncedSearch, selectedCategory, maxPrice, statusFilter]);
+
+    // Split out a "Featured Product" (e.g., the first item) to give a high-end platform feel
+    const [featuredProduct, regularProducts] = useMemo(() => {
+        if (filteredProducts.length === 0) return [null, []];
+        return [filteredProducts[0], filteredProducts.slice(1)];
+    }, [filteredProducts]);
 
     return (
         <>
-            <Head title="Marketplace" />
+            <Head title="Marketplace - HelaHarvest" />
 
-            {/* --- 1. HERO HEADER --- */}
-            <div className="bg-gradient-to-br from-green-600 to-emerald-800 text-white rounded-b-[40px] px-6 py-20 text-center mb-16 shadow-xl shadow-green-900/5 relative overflow-hidden">
-                <div className="max-w-2xl mx-auto space-y-4 relative z-10">
-                    <h1 className="text-4xl lg:text-5xl font-black tracking-tight">
-                        Hela<span className="text-green-300">Harvest</span> Shop
-                    </h1>
-                    <p className="text-green-100/80 text-sm max-w-md mx-auto font-medium leading-relaxed">
-                        නැවුම් අස්වැන්න අතරමැදියන්ගෙන් තොරව සෘජුවම ගොවි බිමෙන් ඔබේ නිවසටම.
-                    </p>
-                </div>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-            </div>
+            <div className="min-h-screen bg-[#f8fafc] dark:bg-[#030712] transition-colors duration-300 pb-24 text-slate-900 dark:text-slate-100 font-sans">
 
-            {/* --- 2. MAIN CONTENT GRID --- */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-4 gap-8 pb-20">
+                {/* --- 1. PREMIUM HERO SECTION WITH STATS --- */}
+                <div className="relative overflow-hidden bg-gradient-to-br from-[#00A63E] via-[#008732] to-[#004d1c] text-white rounded-b-[50px] px-4 py-20 lg:py-28 text-center shadow-2xl shadow-[#00A63E]/10">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_45%)]" />
+                    <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none" />
 
-                {/* Sidebar Filters */}
-                <div className="lg:col-span-1 bg-white dark:bg-[#0f172a] rounded-[24px] border border-gray-200/60 dark:border-white/[0.05] p-6 space-y-6 h-fit sticky top-24 shadow-sm">
-                    {/* Search Input */}
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="Type to search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200/50 dark:border-transparent focus:border-green-500 dark:focus:border-green-500 focus:bg-white rounded-xl px-4 py-3 pl-11 text-xs font-semibold outline-none transition-all"
-                        />
-                        <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                    </div>
+                    <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/20 text-green-300 font-bold text-xs tracking-widest uppercase border border-white/10 backdrop-blur-md">
+                            ⚡ Direct Farm-To-Table Digital Hub
+                        </span>
+                        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-none">
+                            Fresh Harvest <br className="sm:hidden" /> <span className="text-green-300">Marketplace</span>
+                        </h1>
+                        <p className="text-green-100/80 text-base sm:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+                            ලංකාවේ වටෙන්ම ඉන්න ගොවි මහතුන්ගේ නැවුම් එළවළු, පළතුරු සහ ධාන්‍ය වර්ග අතරමැදියන්ගෙන් තොරව එකම තැනකින් මිලදී ගන්න.
+                        </p>
 
-                    {/* Category List */}
-                    <div className="space-y-1.5">
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-3 px-1">Categories</span>
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                                    selectedCategory === cat
-                                        ? 'bg-green-600 text-white shadow-md shadow-green-600/10'
-                                        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/[0.02] hover:text-gray-900 dark:hover:text-white'
-                                }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Product Grid */}
-                <div className="lg:col-span-3">
-                    {filteredProducts.length === 0 ? (
-                        <div className="text-center py-20 bg-white dark:bg-[#0f172a] rounded-[24px] border border-gray-200/60 dark:border-white/[0.05] shadow-sm">
-                            <ShoppingBagIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                            <p className="text-sm font-semibold text-gray-400">No harvest items found matching your filter.</p>
+                        {/* Micro Platform Stats */}
+                        <div className="pt-6 grid grid-cols-3 gap-4 max-w-md mx-auto border-t border-white/10 mt-8">
+                            <div>
+                                <div className="text-xl sm:text-2xl font-black">{products.length}</div>
+                                <div className="text-[10px] text-green-200/60 uppercase font-bold tracking-wider">Total Items</div>
+                            </div>
+                            <div className="border-x border-white/10">
+                                <div className="text-xl sm:text-2xl font-black">{categories.length - 1}</div>
+                                <div className="text-[10px] text-green-200/60 uppercase font-bold tracking-wider">Categories</div>
+                            </div>
+                            <div>
+                                <div className="text-xl sm:text-2xl font-black">Verified</div>
+                                <div className="text-[10px] text-green-200/60 uppercase font-bold tracking-wider">100% Farmers</div>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {filteredProducts.map((product) => (
-                                <div key={product.id} className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-gray-200/60 dark:border-white/[0.05] overflow-hidden group hover:shadow-xl hover:shadow-gray-200/30 dark:hover:shadow-none transition-all duration-300 flex flex-col">
+                    </div>
+                </div>
 
-                                    {/* Product Image */}
-                                    <div className="aspect-square bg-gray-50 dark:bg-white/[0.01] overflow-hidden relative border-b border-gray-100 dark:border-white/[0.02]">
-                                        <img
-                                            src={product.image ? `/storage/${product.image}` : '/images/placeholder.jpg'}
-                                            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                                            alt={product.name}
-                                            loading="lazy" // Page load speed එක වැඩි කරන්න lazy load දාන්න
-                                        />
-                                        <span className="absolute top-4 left-4 bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-md text-[10px] font-bold text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full border border-gray-100 dark:border-white/10 shadow-sm">
-                                            {product.category}
-                                        </span>
-                                    </div>
+                {/* --- 2. MAIN HUB CONTENT --- */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-                                    {/* Product Details */}
-                                    <div className="p-6 flex flex-col flex-grow space-y-4">
-                                        <div className="flex-grow space-y-1">
-                                            <h3 className="font-bold text-gray-900 dark:text-white text-base group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors tracking-tight line-clamp-1">
-                                                {product.name}
-                                            </h3>
-                                            <p className="text-xs text-gray-400 font-medium">
-                                                Farmer: <span className="text-gray-500 dark:text-gray-300">{product.user?.name || 'Hela Farmer'}</span>
-                                            </p>
+                    {/* ADVANCED SIDEBAR FILTERING INTERFACE */}
+                    <div className="lg:col-span-1 bg-white dark:bg-[#0b0f19] rounded-[32px] border border-slate-100 dark:border-slate-900 p-6 space-y-8 h-fit lg:sticky lg:top-8 shadow-sm transition-colors">
+
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                            <h2 className="text-base font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                <FunnelIcon className="w-4 h-4 text-[#00A63E]" /> Filters Panel
+                            </h2>
+                            {(searchQuery || selectedCategory !== 'All' || maxPrice !== '' || statusFilter !== 'all') && (
+                                <button
+                                    onClick={() => { setSearchQuery(''); setSelectedCategory('All'); setMaxPrice(''); setStatusFilter('all'); }}
+                                    className="text-xs font-bold text-red-500 hover:underline"
+                                >
+                                    Reset All
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Search field */}
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ml-1">Search Keywords</label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Carrots, Rice..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full h-12 bg-slate-50 dark:bg-[#121824] border border-slate-200 dark:border-transparent focus:border-[#00A63E] dark:focus:border-[#00A63E] rounded-xl pl-11 pr-4 text-xs font-semibold outline-none transition-all text-slate-900 dark:text-white focus:ring-4 focus:ring-[#00A63E]/10"
+                                />
+                                <MagnifyingGlassIcon className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                            </div>
+                        </div>
+
+                        {/* Categories Group Wrapper */}
+                        <div className="space-y-2.5">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ml-1 block">Categories</label>
+                            <div className="space-y-1">
+                                {categories.map((cat) => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat)}
+                                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                                            selectedCategory === cat
+                                                ? 'bg-[#00A63E]/10 text-[#00A63E] dark:bg-[#00A63E]/20'
+                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                                        }`}
+                                    >
+                                        <span>{cat === 'All' ? '📌 Show All' : cat}</span>
+                                        {selectedCategory === cat && <span className="w-1.5 h-1.5 rounded-full bg-[#00A63E]" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Budget Filtering Slider */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center ml-1">
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Max Price (LKR)</label>
+                                <span className="text-xs font-extrabold text-[#00A63E]">{maxPrice ? `Under ${maxPrice}` : 'Any Price'}</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="0"
+                                max={highestProductPrice}
+                                value={maxPrice || highestProductPrice}
+                                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                                className="w-full accent-[#00A63E] cursor-pointer"
+                            />
+                        </div>
+
+                        {/* Stock Availability Toggle Switch */}
+                        <div className="space-y-2.5 pt-2">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ml-1 block">Availability</label>
+                            <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-[#121824] p-1 rounded-xl border border-slate-100 dark:border-transparent">
+                                <button
+                                    type="button"
+                                    onClick={() => setStatusFilter('all')}
+                                    className={`py-2 text-[11px] font-black uppercase tracking-wider rounded-lg text-center transition-all ${statusFilter === 'all' ? 'bg-white dark:bg-[#0b0f19] text-slate-800 dark:text-white shadow-sm' : 'text-slate-400'}`}
+                                >
+                                    All
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setStatusFilter('in-stock')}
+                                    className={`py-2 text-[11px] font-black uppercase tracking-wider rounded-lg text-center transition-all ${statusFilter === 'in-stock' ? 'bg-white dark:bg-[#0b0f19] text-[#00A63E] shadow-sm' : 'text-slate-400'}`}
+                                >
+                                    In Stock
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* INTERACTIVE PRODUCTS VIEWPORT */}
+                    <div className="lg:col-span-3 space-y-8">
+
+                        {filteredProducts.length === 0 ? (
+                            <div className="text-center py-24 bg-white dark:bg-[#0b0f19] rounded-[32px] border border-slate-100 dark:border-slate-900 shadow-sm transition-colors">
+                                <ShoppingBagIcon className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                                <h3 className="text-lg font-black text-slate-800 dark:text-slate-200">No Harvest Items Found</h3>
+                                <p className="text-sm font-medium text-slate-400 mt-1 max-w-xs mx-auto">We couldn't find matching items. Try resetting the filters or tweaking your keywords.</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* FEATURED HERO CARD (Premium Component Layout) */}
+                                {featuredProduct && selectedCategory === 'All' && !searchQuery && (
+                                    <div className="w-full bg-white dark:bg-[#0b0f19] rounded-[32px] border border-slate-100 dark:border-slate-900 overflow-hidden shadow-sm flex flex-col md:flex-row group transition-all duration-300 hover:shadow-md">
+                                        <div className="md:w-[45%] relative aspect-[4/3] md:aspect-auto overflow-hidden bg-slate-50 dark:bg-slate-900">
+                                            <img
+                                                src={featuredProduct.image ? `/storage/${featuredProduct.image}` : '/images/placeholder.jpg'}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                                alt={featuredProduct.name}
+                                            />
+                                            <span className="absolute top-4 left-4 bg-[#00A63E] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-md">
+                                                ★ Trending Harvest
+                                            </span>
                                         </div>
-
-                                        {/* Stock & Price Row */}
-                                        <div className="flex items-baseline justify-between border-t border-gray-100 dark:border-white/[0.05] pt-4">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Price</span>
-                                                <span className="text-lg font-black text-green-600 dark:text-green-500">LKR {product.price}</span>
+                                        <div className="p-8 flex flex-col justify-between flex-1 space-y-6">
+                                            <div className="space-y-3">
+                                                <span className="text-xs font-black text-[#00A63E] uppercase tracking-wider bg-[#00A63E]/5 px-3 py-1 rounded-md">{featuredProduct.category}</span>
+                                                <h3 className="text-2xl sm:text-3xl font-black text-slate-950 dark:text-white tracking-tight">{featuredProduct.name}</h3>
+                                                <p className="text-sm text-slate-400 font-medium flex items-center gap-1.5">
+                                                    <UserIcon className="w-4 h-4 text-slate-400" />
+                                                    Farmer: <span className="text-slate-700 dark:text-slate-300 font-bold">{featuredProduct.user?.name || 'Hela Farmer'}</span>
+                                                </p>
                                             </div>
-                                            <div className="text-right">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Available</span>
-                                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">{product.stock} {product.unit}</span>
+                                            <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800/60 pt-5">
+                                                <div>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Direct Price</span>
+                                                    <span className="text-3xl font-black text-[#00A63E]">LKR {featuredProduct.price}</span>
+                                                    <span className="text-xs text-slate-400 font-bold"> / per {featuredProduct.unit}</span>
+                                                </div>
+                                                <Link
+                                                    href={route('shop.products.show', featuredProduct.id)}
+                                                    className="h-14 px-6 rounded-xl bg-gradient-to-r from-[#00A63E] to-[#00782d] text-white text-xs font-black tracking-wider uppercase shadow-md shadow-[#00A63E]/10 hover:opacity-95 flex items-center justify-center transition-all"
+                                                >
+                                                    Get Deals
+                                                </Link>
                                             </div>
                                         </div>
-
-                                        {/* Action Button */}
-                                        {/* global ziggy helper එක කෙලින්ම route() විදිහට වැඩ කරන නිසා import නැතුව පාවිච්චි කලා */}
-                                        <Link
-                                            href={route('shop.products.show', product.id)}
-                                            className="w-full bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 text-center py-3 rounded-xl text-xs font-bold transition-all group-hover:bg-green-600 group-hover:text-white shadow-sm"
-                                        >
-                                            View Details
-                                        </Link>
                                     </div>
+                                )}
 
+                                {/* REGULAR PRODUCTS GRID ROW */}
+                                <div>
+                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">
+                                        {selectedCategory !== 'All' || searchQuery ? `Filtered Results (${filteredProducts.length})` : 'All Available Harvest'}
+                                    </h4>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {(selectedCategory !== 'All' || searchQuery ? filteredProducts : regularProducts).map((product) => (
+                                            <div
+                                                key={product.id}
+                                                className="bg-white dark:bg-[#0b0f19] rounded-[28px] border border-slate-100 dark:border-slate-900 overflow-hidden group hover:shadow-[0_20px_50px_rgba(0,0,0,0.03)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.25)] transition-all duration-300 flex flex-col justify-between"
+                                            >
+                                                {/* Top Image Frame */}
+                                                <div className="aspect-[1.1] bg-slate-50 dark:bg-slate-900/40 relative overflow-hidden">
+                                                    <img
+                                                        src={product.image ? `/storage/${product.image}` : '/images/placeholder.jpg'}
+                                                        className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                                                        alt={product.name}
+                                                        loading="lazy"
+                                                    />
+                                                    {/* Category Floating Tag */}
+                                                    <span className="absolute top-4 left-4 bg-white/90 dark:bg-[#0b0f19]/90 backdrop-blur-md text-[9px] font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-100 dark:border-white/5 shadow-sm">
+                                                        {product.category}
+                                                    </span>
+
+                                                    {/* Out of Stock Blur Overlay logic */}
+                                                    {product.stock <= 0 && (
+                                                        <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] flex items-center justify-center">
+                                                            <span className="bg-red-500 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1">
+                                                                <XCircleIcon className="w-3.5 h-3.5" /> Sold Out
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Meta Description Info */}
+                                                <div className="p-5 space-y-4 flex-grow flex flex-col justify-between">
+                                                    <div className="space-y-1">
+                                                        <h3 className="font-extrabold text-slate-950 dark:text-white text-base group-hover:text-[#00A63E] transition-colors tracking-tight line-clamp-1">
+                                                            {product.name}
+                                                        </h3>
+                                                        <div className="flex items-center gap-1 text-xs text-slate-400 font-medium">
+                                                            <UserIcon className="w-3.5 h-3.5" />
+                                                            <span>Farmer: <span className="text-slate-600 dark:text-slate-300 font-bold">{product.user?.name || 'Hela Farmer'}</span></span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Price Tag Row Container */}
+                                                    <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800/60 pt-3">
+                                                        <div>
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Price</span>
+                                                            <span className="text-lg font-black text-[#00A63E]">LKR {product.price}</span>
+                                                            <span className="text-[10px] text-slate-400 font-bold">/{product.unit}</span>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Stock</span>
+                                                            <span className={`text-xs font-bold px-2 py-0.5 rounded-md mt-0.5 inline-block ${product.stock > 0 ? 'text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60' : 'text-red-400 bg-red-500/5'}`}>
+                                                                {product.stock > 0 ? `${product.stock} ${product.unit}` : 'Unavailable'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Link Trigger action button */}
+                                                    <Link
+                                                        href={route('shop.products.show', product.id)}
+                                                        className="w-full h-11 rounded-xl bg-slate-50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200 text-center flex items-center justify-center text-xs font-black tracking-wider uppercase transition-all duration-200 group-hover:bg-[#00A63E] group-hover:text-white shadow-sm"
+                                                    >
+                                                        View Details
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                            </>
+                        )}
+                    </div>
 
+                </div>
             </div>
         </>
     );
